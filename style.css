@@ -8,7 +8,7 @@ body {
 .container {
     display: flex;
     justify-content: space-between;
-    max-width: 1000px; /* Increased maximum width */
+    max-width: 1200px; /* Increased maximum width */
     margin: 5% auto;
 }
 
@@ -18,7 +18,7 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 35%; /* Decreased the width of the input section */
+    max-width: 20%; /* Decreased the width of the input section */
     margin-right: 20px; /* Added margin to separate input and output sections */
 }
 
@@ -28,7 +28,7 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 60%; /* Increased the width of the output section */
+    max-width: 80%; /* Increased the width of the output section */
 }
 
 h1 {
@@ -48,8 +48,8 @@ label {
     margin-bottom: 5px;
 }
 
-select, input[type="text"] {
-    width: 50%;
+select, input[type="text"], input[type="number"] {
+    width: 90%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -84,4 +84,32 @@ input[type="submit"]:hover {
     text-decoration: none;
     font-weight: bold;
     color: #0366d6; /* GitHub link color */
+}
+
+/* Add styles for the output table */
+#output-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#output-table th,
+#output-table td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+
+#output-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+
+#output-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#output-table tr:hover {
+    background-color: #ddd;
+    scale: 1.02;
 }

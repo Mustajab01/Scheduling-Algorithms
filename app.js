@@ -73,9 +73,13 @@ function roundRobin(arrivalTimes, burstTimes, timeQuantum) {
     let currentTime = 0;
     let queue = [];
 
-    while (queue.length > 0 || remainingBurstTimes.some((bt) => bt > 0)) {
+    while (true) {
+        let allProcessesCompleted = true;
+
         for (let i = 0; i < n; i++) {
             if (arrivalTimes[i] <= currentTime && remainingBurstTimes[i] > 0) {
+                allProcessesCompleted = false;
+
                 const executeTime = Math.min(timeQuantum, remainingBurstTimes[i]);
                 processes.push({
                     processNumber: i + 1,
@@ -92,20 +96,25 @@ function roundRobin(arrivalTimes, burstTimes, timeQuantum) {
             }
         }
 
-        // Handle the queue in a circular manner
+        if (allProcessesCompleted) {
+            break;
+        }
+
         if (queue.length > 0) {
             const nextProcessIndex = queue.shift();
             queue.push(nextProcessIndex);
             currentTime++;
         } else {
-            // No processes in the queue, find the next arrival time
-            const minArrivalTime = Math.min(...arrivalTimes.filter((at, i) => remainingBurstTimes[i] > 0));
+            const minArrivalTime = Math.min(
+                ...arrivalTimes.filter((at, i) => remainingBurstTimes[i] > 0)
+            );
             currentTime = Math.max(currentTime, minArrivalTime);
         }
     }
 
     // Calculate turnaround and waiting times for each process
     for (let i = 0; i < processes.length; i++) {
+        console.log("Number of processes:" + processes.length);
         const process = processes[i];
         const index = process.processNumber - 1;
         process.arrivalTime = arrivalTimes[index];
@@ -116,6 +125,7 @@ function roundRobin(arrivalTimes, burstTimes, timeQuantum) {
 
     return processes;
 }
+
 
 
 

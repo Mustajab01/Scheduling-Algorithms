@@ -246,7 +246,7 @@ function srt(arrivalTimes, burstTimes) {
             arrivalTime: arrivalTimes[i],
             burstTime: burstTimes[i],
             startTime: processes[i].startTime,
-            endTime: processes[i].endTime,
+            endTime: completionTime[i],
             turnaroundTime: turnaroundTime,
             waitingTime: waitingTime,
         });

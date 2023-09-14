@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const burstTimes = document.getElementById("burst-times").value.split(" ").map(Number);
         const timeQuantum = parseInt(document.getElementById("time-quantum").value, 10);
 
+        console.log("Number of Arrival Times:" + arrivalTimes.length + "\nNumber of Burst Times:" + burstTimes.length);
+
         // Validate input
         if (arrivalTimes.length !== burstTimes.length) {
             alert("Number of arrival times must match the number of burst times.");
@@ -64,34 +66,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function roundRobin(arrivalTimes, burstTimes) {
-    const timeQuantum = 2; // You can adjust the time quantum as needed
+function roundRobin(arrivalTimes, burstTimes, timeQuantum) {
     const n = arrivalTimes.length;
     const processes = [];
     const remainingBurstTimes = [...burstTimes];
     let currentTime = 0;
+    let queue = [];
 
-    while (remainingBurstTimes.some((bt) => bt > 0)) {
+    while (queue.length > 0 || remainingBurstTimes.some((bt) => bt > 0)) {
         for (let i = 0; i < n; i++) {
-            if (remainingBurstTimes[i] > 0) {
-                const executeTime = Math.min(remainingBurstTimes[i], timeQuantum);
+            if (arrivalTimes[i] <= currentTime && remainingBurstTimes[i] > 0) {
+                const executeTime = Math.min(timeQuantum, remainingBurstTimes[i]);
                 processes.push({
                     processNumber: i + 1,
-                    arrivalTime: arrivalTimes[i],
-                    burstTime: burstTimes[i],
                     startTime: currentTime,
                     endTime: currentTime + executeTime,
-                    turnaroundTime: currentTime + executeTime - arrivalTimes[i],
-                    waitingTime: currentTime - arrivalTimes[i],
                 });
                 currentTime += executeTime;
                 remainingBurstTimes[i] -= executeTime;
+
+                // If the process is not completed, add it back to the queue
+                if (remainingBurstTimes[i] > 0) {
+                    queue.push(i);
+                }
             }
         }
+
+        // Handle the queue in a circular manner
+        if (queue.length > 0) {
+            const nextProcessIndex = queue.shift();
+            queue.push(nextProcessIndex);
+            currentTime++;
+        } else {
+            // No processes in the queue, find the next arrival time
+            const minArrivalTime = Math.min(...arrivalTimes.filter((at, i) => remainingBurstTimes[i] > 0));
+            currentTime = Math.max(currentTime, minArrivalTime);
+        }
+    }
+
+    // Calculate turnaround and waiting times for each process
+    for (let i = 0; i < processes.length; i++) {
+        const process = processes[i];
+        const index = process.processNumber - 1;
+        process.arrivalTime = arrivalTimes[index];
+        process.burstTime = burstTimes[index];
+        process.turnaroundTime = process.endTime - process.arrivalTime;
+        process.waitingTime = process.turnaroundTime - process.burstTime;
     }
 
     return processes;
 }
+
 
 
 function fcfs(arrivalTimes, burstTimes) {
@@ -158,52 +183,76 @@ function sjf(arrivalTimes, burstTimes) {
     return processes;
 }
 
-
 function srt(arrivalTimes, burstTimes) {
-    // Implementing SRT is more complex and may require a preemptive approach.
-    // You can use a priority queue or a timer-based approach to simulate it.
-    // The provided code is a simplified example and may not cover all cases.
-
     const n = arrivalTimes.length;
     const processes = [];
+    const completionTime = Array(n).fill(0);
     const remainingBurstTimes = [...burstTimes];
+
     let currentTime = 0;
 
-    while (processes.length < n) {
-        const eligibleProcesses = [];
+    while (true) {
+        let minBurstTime = Infinity;
+        let shortestProcessIndex = -1;
+
         for (let i = 0; i < n; i++) {
-            if (arrivalTimes[i] <= currentTime && remainingBurstTimes[i] > 0) {
-                eligibleProcesses.push({
-                    processNumber: i + 1,
-                    arrivalTime: arrivalTimes[i],
-                    burstTime: remainingBurstTimes[i],
-                });
+            if (arrivalTimes[i] <= currentTime && remainingBurstTimes[i] < minBurstTime && remainingBurstTimes[i] > 0) {
+                minBurstTime = remainingBurstTimes[i];
+                shortestProcessIndex = i;
             }
         }
-        eligibleProcesses.sort((a, b) => a.burstTime - b.burstTime);
 
-        if (eligibleProcesses.length === 0) {
+        if (shortestProcessIndex === -1) {
+            // No process can be executed, move time forward
             currentTime++;
-            continue;
-        }
+        } else {
+            // Execute the shortest remaining time process for one time unit
+            processes.push({
+                processNumber: shortestProcessIndex + 1,
+                startTime: currentTime,
+                endTime: currentTime + 1,
+            });
+            currentTime++;
+            remainingBurstTimes[shortestProcessIndex]--;
 
-        const selectedProcess = eligibleProcesses[0];
-        const index = selectedProcess.processNumber - 1;
-        const executeTime = 1; // SRT typically involves preemptive execution
-        processes.push({
-            processNumber: selectedProcess.processNumber,
-            arrivalTime: selectedProcess.arrivalTime,
-            burstTime: burstTimes[index],
-            startTime: currentTime,
-            endTime: currentTime + executeTime,
-            turnaroundTime: currentTime + executeTime - selectedProcess.arrivalTime,
-            waitingTime: currentTime - selectedProcess.arrivalTime,
-        });
-        currentTime += executeTime;
-        remainingBurstTimes[index] -= executeTime;
+            // Check if the process is completed
+            if (remainingBurstTimes[shortestProcessIndex] === 0) {
+                completionTime[shortestProcessIndex] = currentTime;
+            }
+
+            // Check if all processes are completed
+            let allProcessesCompleted = true;
+            for (let i = 0; i < n; i++) {
+                if (remainingBurstTimes[i] > 0) {
+                    allProcessesCompleted = false;
+                    break;
+                }
+            }
+
+            if (allProcessesCompleted) {
+                break; // All processes have completed, exit the loop
+            }
+        }
     }
 
-    return processes;
+    // Generate the output table
+    const outputTable = [];
+    for (let i = 0; i < n; i++) {
+        const turnaroundTime = completionTime[i] - arrivalTimes[i];
+        const waitingTime = turnaroundTime - burstTimes[i];
+
+        outputTable.push({
+            processNumber: i + 1,
+            arrivalTime: arrivalTimes[i],
+            burstTime: burstTimes[i],
+            startTime: processes[i].startTime,
+            endTime: processes[i].endTime,
+            turnaroundTime: turnaroundTime,
+            waitingTime: waitingTime,
+        });
+    }
+
+    return outputTable;
 }
 
 

@@ -113,3 +113,30 @@ input[type="submit"]:hover {
     background-color: #ddd;
     scale: 1.02;
 }
+
+/* GANNT CHART STYLING */
+#gantt-chart {
+    text-align: center; /* Center align the Gantt chart */
+    overflow: auto; /* Add horizontal scrolling if needed */
+    margin: 10px 0;
+    /* background-color: red; */
+}
+
+#gantt-chart-container {
+    display: flex;
+    align-items: center; /* Vertically center the Gantt blocks */
+    justify-content: center; /* Horizontally center the Gantt blocks */
+    flex-wrap: nowrap; /* Prevent Gantt blocks from wrapping to the next line */
+    overflow: auto; /* Add horizontal scrolling if needed */
+    /* background-color: black; */
+    margin: 5px 0;
+}
+
+.gantt-block {
+    display: inline-block;
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #3798ff;
+}

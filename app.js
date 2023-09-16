@@ -344,4 +344,21 @@ function generateOutputTable(processes) {
         .join("");
 
     outputTable.innerHTML = tableHeaders + tableRows;
+
+    // Call the function to generate the Gantt chart
+    generateGanttChart(processes);
+}
+function generateGanttChart(processes) {
+    const ganttChartContainer = document.getElementById("gantt-chart-container");
+    let ganttChartContent = '';
+
+    processes.forEach((process) => {
+        // Create Gantt chart block for each process
+        const blockWidth = 5;
+        ganttChartContent += `
+            <div class="gantt-block" style="width: ${blockWidth * 10}px;">P${process.processNumber}</div>
+        `;
+    });
+
+    ganttChartContainer.innerHTML = ganttChartContent;
 }

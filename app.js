@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Generate the output table
-        generateOutputTable(processes);
+        generateOutputTable(processes, algorithm);
     });
 
     // Show or hide the time quantum input field based on the selected algorithm
@@ -272,11 +272,22 @@ function hrrn(arrivalTimes, burstTimes) {
     const remainingBurstTimes = [...burstTimes];
     let currentTime = 0;
 
-    while (processes.length < n) {
+    let bTimes = burstTimes;
+    console.log(burstTimes);
+    console.log(Math.max(...burstTimes));
+
+    let maxTime = 0;
+    for (let i = 0; i < bTimes.length; i++) {
+        maxTime += bTimes[i];
+    }
+
+    console.log(maxTime);
+    while (currentTime < maxTime) {
         const eligibleProcesses = [];
         for (let i = 0; i < n; i++) {
             if (arrivalTimes[i] <= currentTime && remainingBurstTimes[i] > 0) {
                 const waitingTime = currentTime - arrivalTimes[i];
+                // Calculate Response Ratio
                 const responseRatio = (waitingTime + remainingBurstTimes[i]) / remainingBurstTimes[i];
                 eligibleProcesses.push({
                     processNumber: i + 1,
@@ -294,6 +305,7 @@ function hrrn(arrivalTimes, burstTimes) {
         }
 
         const selectedProcess = eligibleProcesses[0];
+        console.log(selectedProcess.processNumber);
         const index = selectedProcess.processNumber - 1;
         const executeTime = 1; // HRRN typically involves preemptive execution
         processes.push({
@@ -304,6 +316,7 @@ function hrrn(arrivalTimes, burstTimes) {
             endTime: currentTime + executeTime,
             turnaroundTime: currentTime + executeTime - selectedProcess.arrivalTime,
             waitingTime: currentTime - selectedProcess.arrivalTime,
+            responseRatio: selectedProcess.responseRatio, // Assign Response Ratio to the process
         });
         currentTime += executeTime;
         remainingBurstTimes[index] -= executeTime;
@@ -313,9 +326,10 @@ function hrrn(arrivalTimes, burstTimes) {
 }
 
 
-function generateOutputTable(processes) {
+
+function generateOutputTable(processes, algorithm) {
     const outputTable = document.getElementById("output-table");
-    const tableHeaders = `
+    let tableHeaders = `
         <tr>
             <th>Process Number</th>
             <th>Arrival Time</th>
@@ -324,30 +338,49 @@ function generateOutputTable(processes) {
             <th>End Time</th>
             <th>Turnaround Time</th>
             <th>Waiting Time</th>
-        </tr>
-    `;
+            <th>Response Ratio</th>
+            <th>Response Ratios of Other Eligible Processes</th>
+        </tr>`;
 
-    const tableRows = processes
-        .map(
-            (process) => `
-                <tr>
-                    <td>P${process.processNumber}</td>
-                    <td>${process.arrivalTime}</td>
-                    <td>${process.burstTime}</td>
-                    <td>${process.startTime}</td>
-                    <td>${process.endTime}</td>
-                    <td>${process.turnaroundTime}</td>
-                    <td>${process.waitingTime}</td>
-                </tr>
-            `
-        )
-        .join("");
+    const tableRows = processes.map((process, index) => {
+        let row = `
+            <tr>
+                <td>P${process.processNumber}</td>
+                <td>${process.arrivalTime}</td>
+                <td>${process.burstTime}</td>
+                <td>${process.startTime}</td>
+                <td>${process.endTime}</td>
+                <td>${process.turnaroundTime}</td>
+                <td>${process.waitingTime}</td>
+                <td>${process.responseRatio.toFixed(2)}</td>
+                <td>`;
+
+        if (algorithm === "HRRN") {
+            // Calculate Response Ratios of other eligible processes
+            const currentTime = process.endTime;
+            const otherProcesses = processes
+                .filter((p, i) => i !== index && p.arrivalTime <= currentTime && p.burstTime > 0)
+                .map((p) => {
+                    const waitingTime = currentTime - p.arrivalTime;
+                    const responseRatio = (waitingTime + p.burstTime) / p.burstTime;
+                    return `P${p.processNumber}: ${responseRatio.toFixed(2)}`;
+                })
+                .join(", ");
+            row += otherProcesses;
+        }
+
+        row += `</td></tr>`;
+        return row;
+    }).join("");
 
     outputTable.innerHTML = tableHeaders + tableRows;
 
     // Call the function to generate the Gantt chart
     generateGanttChart(processes);
 }
+
+
+
 function generateGanttChart(processes) {
     const ganttChartContainer = document.getElementById("gantt-chart-container");
     let ganttChartContent = '';

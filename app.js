@@ -11,13 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const arrivalTimes = document.getElementById("arrival-times").value.split(" ").map(Number);
         const burstTimes = document.getElementById("burst-times").value.split(" ").map(Number);
         const timeQuantum = parseInt(document.getElementById("time-quantum").value, 10);
-
-        console.log("Number of Arrival Times:" + arrivalTimes.length + "\nNumber of Burst Times:" + burstTimes.length);
-
         // Validate input
         if (arrivalTimes.length !== burstTimes.length) {
             alert("Number of arrival times must match the number of burst times.");
-            console.log("Number of Arrival Times:" + arrivalTimes.length + "\nNumber of Burst Times:" + burstTimes.length);
             return;
         }
 
@@ -114,7 +110,6 @@ function roundRobin(arrivalTimes, burstTimes, timeQuantum) {
 
     // Calculate turnaround and waiting times for each process
     for (let i = 0; i < processes.length; i++) {
-        console.log("Number of processes:" + processes.length);
         const process = processes[i];
         const index = process.processNumber - 1;
         process.arrivalTime = arrivalTimes[index];
@@ -273,15 +268,12 @@ function hrrn(arrivalTimes, burstTimes) {
     let currentTime = 0;
 
     let bTimes = burstTimes;
-    console.log(burstTimes);
-    console.log(Math.max(...burstTimes));
 
     let maxTime = 0;
     for (let i = 0; i < bTimes.length; i++) {
         maxTime += bTimes[i];
     }
 
-    console.log(maxTime);
     while (currentTime < maxTime) {
         const eligibleProcesses = [];
         for (let i = 0; i < n; i++) {
@@ -305,7 +297,6 @@ function hrrn(arrivalTimes, burstTimes) {
         }
 
         const selectedProcess = eligibleProcesses[0];
-        console.log(selectedProcess.processNumber);
         const index = selectedProcess.processNumber - 1;
         const executeTime = 1; // HRRN typically involves preemptive execution
         processes.push({

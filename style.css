@@ -8,27 +8,27 @@ body {
 .container {
     display: flex;
     justify-content: space-between;
-    max-width: 1200px; /* Increased maximum width */
+    max-width: 1200px; 
     margin: 5% auto;
 }
 
 .input-section {
-    flex: 1; /* Adjusted flex property to make it smaller */
+    flex: 1;
     background-color: #fff;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 20%; /* Decreased the width of the input section */
-    margin-right: 20px; /* Added margin to separate input and output sections */
+    max-width: 20%; 
+    margin-right: 20px;
 }
 
 .output-section {
-    flex: 2; /* Increased flex property to make it wider */
+    flex: 2;
     background-color: #fff;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 80%; /* Increased the width of the output section */
+    max-width: 80%;
 }
 
 h1 {
@@ -58,6 +58,7 @@ select, input[type="text"], input[type="number"] {
 
 input[type="submit"] {
     background-color: #007BFF;
+    width: 100%;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -75,18 +76,17 @@ input[type="submit"]:hover {
 }
 
 .github-section img {
-    width: 50px; /* Adjust the width as needed */
+    width: 50px;
     vertical-align: middle;
-    margin-right: 10px; /* Add some spacing between the logo and text */
+    margin-right: 10px;
 }
 
 .github-section a {
     text-decoration: none;
     font-weight: bold;
-    color: #0366d6; /* GitHub link color */
+    color: #0366d6; 
 }
 
-/* Add styles for the output table */
 #output-table {
     width: 100%;
     border-collapse: collapse;
@@ -116,19 +116,17 @@ input[type="submit"]:hover {
 
 /* GANNT CHART STYLING */
 #gantt-chart {
-    text-align: center; /* Center align the Gantt chart */
-    overflow: auto; /* Add horizontal scrolling if needed */
+    text-align: center; 
+    overflow: auto;
     margin: 10px 0;
-    /* background-color: red; */
 }
 
 #gantt-chart-container {
     display: flex;
-    align-items: center; /* Vertically center the Gantt blocks */
-    justify-content: center; /* Horizontally center the Gantt blocks */
-    flex-wrap: nowrap; /* Prevent Gantt blocks from wrapping to the next line */
-    overflow: auto; /* Add horizontal scrolling if needed */
-    /* background-color: black; */
+    align-items: center; 
+    justify-content: center; 
+    flex-wrap: nowrap; 
+    overflow: auto; 
     margin: 5px 0;
 }
 
@@ -139,4 +137,51 @@ input[type="submit"]:hover {
     text-align: center;
     padding: 10px;
     border: 1px solid #3798ff;
+}
+
+@media only screen and (max-width: 768px) {
+    .container {
+        flex-direction: column; 
+        margin: 5% 5%; 
+        max-width: none;
+    }
+
+    .input-section,
+    .output-section {
+        max-width: none; 
+        margin: 1rem 0;
+        overflow-x: auto;
+    }
+    #output-table {   
+        table-layout: fixed;
+    }
+    #output-table th {
+        background-color: #f8f8f8;
+        font-weight: bold;
+        font-size: 14px; 
+        padding: 8px 10px; 
+        white-space: nowrap; 
+        overflow: auto; 
+    }
+    
+    #output-table td {
+        border: 1px solid #dddddd;
+        text-align: center;
+        padding: 8px 4px;
+        white-space: nowrap;
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+    }
+    
+    #output-table tr:hover {
+        background-color: #ddd;
+        transform: scale(1.02);
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"],
+    input[type="submit"] {
+        width: 100%; 
+    }
 }
